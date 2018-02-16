@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "name": "Unload Tab Reloader",
+  "version": "0.1.0",
+  "description": "When the unload(discard) tab is selected, reload latest page and display it.",
+  "author": "makitaaaaa",
+  "homepage_url": "https://github.com/makitaaaaa/unload-tab-reloader",
+  "applications": {
+    "gecko": {
+      "id": "unloadtabreloader-dev@makitaaaaa",
+      "strict_min_version": "58.0"
+    }
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "webNavigation"
+  ],
+  "web_accessible_resources": [
+    "reload.html"
+  ]
+}
