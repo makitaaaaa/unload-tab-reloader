@@ -1,4 +1,4 @@
-# unload-tab-reloader
+# Unload Tab Reloader
 
 Unload Tab Reloader is WebExtensions Add-on for Mozilla Firefox
 
