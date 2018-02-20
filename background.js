@@ -22,7 +22,7 @@
       if (isActivateUnloadTab(tab, changeInfo)) {
         // detect unload tab
         unloadTabSet.add(tabId);
-        return true;
+        return;
       }
       if (unloadTabSet.has(tabId) && isUrlHttp(tab)) {
         // move to reload page
@@ -33,16 +33,15 @@
           url: URL_RELOAD,
           loadReplace: false
         });
-        return true;
+        return;
       }
       if (unloadTabSet.has(tabId) && changeInfo.hasOwnProperty("url") && changeInfo.url !== URL_BLANK) {
         unloadTabSet.delete(tabId);
-        return true;
+        return;
       }
     } catch (e) {
       logging(e);
     }
-    return true;
   }
 
   const onWebNavigationBeforeNavigate = async (details) => {
@@ -58,7 +57,6 @@
           loadReplace: true
         });
       }
-      return true;
     } catch (e) {
       logging(e);
     }
