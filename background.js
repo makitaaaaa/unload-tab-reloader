@@ -10,7 +10,7 @@
   const URL_RELOAD = browser.runtime.getURL("reload.html");
 
   const isActivateUnloadTab = (tab, changeInfo) => {
-    return changeInfo.hasOwnProperty("discarded") && changeInfo.discarded === false && tab.hasOwnProperty("url") && tab.url === URL_BLANK && tab.status === "complete";
+    return tab.active === true && changeInfo.hasOwnProperty("discarded") && changeInfo.discarded === false && tab.hasOwnProperty("url") && tab.url === URL_BLANK && tab.status === "complete";
   }
 
   const isUrlHttp = (hasUrlObject) => {
