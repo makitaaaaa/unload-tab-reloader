@@ -25,12 +25,11 @@
   }
 
   /**
-   * 
    * @param {number} tabId 
    * @param {object} changeInfo 
    * @param {browser.tabs.Tab} tab 
    */
-  const onTabUpdated = async (tabId, changeInfo, tab) => {
+  const onTabUpdated = (tabId, changeInfo, tab) => {
     try {
       if (isActivateUnloadTab(tab, changeInfo)) {
         // detect unload tab
