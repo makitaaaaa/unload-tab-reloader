@@ -9,14 +9,27 @@
   const URL_BLANK = "about:blank";
   const URL_RELOAD = browser.runtime.getURL("reload.html");
 
+  /**
+   * @param {browser.tabs.Tab} tab 
+   * @param {object} changeInfo 
+   */
   const isActivateUnloadTab = (tab, changeInfo) => {
     return tab.active === true && changeInfo.hasOwnProperty("discarded") && changeInfo.discarded === false && tab.hasOwnProperty("url") && tab.url === URL_BLANK && tab.status === "complete";
   }
 
+  /**
+   * @param {object} hasUrlObject 
+   */
   const isUrlHttp = (hasUrlObject) => {
     return hasUrlObject.hasOwnProperty("url") && hasUrlObject.url.startsWith("http");
   }
 
+  /**
+   * 
+   * @param {number} tabId 
+   * @param {object} changeInfo 
+   * @param {browser.tabs.Tab} tab 
+   */
   const onTabUpdated = async (tabId, changeInfo, tab) => {
     try {
       if (isActivateUnloadTab(tab, changeInfo)) {
@@ -44,6 +57,9 @@
     }
   }
 
+  /**
+   * @param {object} details 
+   */
   const onWebNavigationBeforeNavigate = async (details) => {
     try {
       let tabId = details.tabId;
@@ -62,6 +78,10 @@
     }
   }
 
+  /**
+   * @param {number} tabId 
+   * @param {object} removeInfo 
+   */
   const onTabRemoved = (tabId, removeInfo) => {
     try {
       unloadTabSet.delete(tabId);
@@ -71,6 +91,9 @@
     }
   }
 
+  /**
+   * @param {*} args 
+   */
   const logging = (...args) => {
     // eslint-disable-next-line no-console
     console.log(...args);
@@ -78,6 +101,7 @@
     console.trace();
   }
 
+  /** */
   const initialize = () => {
     const URL_FILTER = {
       url: [{
