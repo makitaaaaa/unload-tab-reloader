@@ -36,21 +36,6 @@
         unloadTabSet.add(tabId);
         return;
       }
-      if (unloadTabSet.has(tabId) && isUrlHttp(tab)) {
-        // move to reload page
-        unloadTabSet.delete(tabId);
-        const url = tab.url;
-        reloadUrlMap.set(tabId, url);
-        browser.tabs.update(tabId, {
-          url: URL_RELOAD,
-          loadReplace: false
-        });
-        return;
-      }
-      if (unloadTabSet.has(tabId) && changeInfo.hasOwnProperty("url") && changeInfo.url !== URL_BLANK) {
-        unloadTabSet.delete(tabId);
-        return;
-      }
     } catch (e) {
       logging(e);
     }
@@ -59,11 +44,20 @@
   /**
    * @param {object} details 
    */
-  const onWebNavigationBeforeNavigate = async (details) => {
+  const onWebNavigationBeforeNavigate = (details) => {
     try {
       let tabId = details.tabId;
-      let url = details.url;
-      if (reloadUrlMap.has(tabId) && url === URL_RELOAD) {
+      if (unloadTabSet.has(tabId) && isUrlHttp(details)) {
+        // move to reload page
+        unloadTabSet.delete(tabId);
+        reloadUrlMap.set(tabId, details.url);
+        browser.tabs.update(tabId, {
+          url: `${URL_RELOAD}?${new URLSearchParams({url: details.url})}`,
+          loadReplace: true
+        });
+        return;
+      }
+      if (reloadUrlMap.has(tabId) && details.hasOwnProperty("url") && details.url.startsWith(URL_RELOAD)) {
         // reload (move) tab
         const url = reloadUrlMap.get(tabId);
         reloadUrlMap.delete(tabId);
@@ -71,7 +65,36 @@
           url: url,
           loadReplace: true
         });
+        return;
       }
+    } catch (e) {
+      logging(e);
+    }
+  }
+
+  /**
+   * 
+   * @param {*} message 
+   * @param {browser.runtime.MessageSender} sender 
+   * @param {function} response 
+   */
+  const onMessage = (message, sender, response) => {
+    try {
+      if (message.hasOwnProperty("url") && message.url.startsWith(URL_RELOAD)) {
+        // move to reload page
+        const tab = sender.tab;
+        const tabId = tab.id;
+        unloadTabSet.delete(tabId);
+        reloadUrlMap.delete(tabId);
+        let url = new URL(message.url);
+        const params = new URLSearchParams(url.search.slice(1));
+        browser.tabs.update(tabId, {
+          url: params.get("url"),
+          loadReplace: true
+        });
+        return false;
+      }
+      return false;
     } catch (e) {
       logging(e);
     }
@@ -102,14 +125,22 @@
 
   /** */
   const initialize = () => {
-    const URL_FILTER = {
-      url: [{
-        urlEquals: URL_RELOAD
-      }]
+    try {
+      /** @type {browser.webNavigation.EventUrlFilters} */
+      const URL_FILTER = {
+        url: [{
+          urlPrefix: URL_RELOAD
+        }, {
+          schemes: ["http", "https"]
+        }]
+      }
+      browser.tabs.onUpdated.addListener(onTabUpdated);
+      browser.tabs.onRemoved.addListener(onTabRemoved);
+      browser.webNavigation.onBeforeNavigate.addListener(onWebNavigationBeforeNavigate, URL_FILTER);
+      browser.runtime.onMessage.addListener(onMessage);
+    } catch (e) {
+      logging(e);
     }
-    browser.tabs.onUpdated.addListener(onTabUpdated);
-    browser.tabs.onRemoved.addListener(onTabRemoved);
-    browser.webNavigation.onBeforeNavigate.addListener(onWebNavigationBeforeNavigate, URL_FILTER);
   }
 
   initialize();
