@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Unload Tab Reloader",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "When the unload(discard) tab is selected, reload latest page and display it.",
   "author": "makitaaaaa",
   "homepage_url": "https://github.com/makitaaaaa/unload-tab-reloader",
